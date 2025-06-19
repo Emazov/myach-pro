@@ -17,6 +17,35 @@ interface CategorizedPlayers {
 	[key: string]: Player[];
 }
 
+interface ModalProps {
+	isOpen: boolean;
+	message: string;
+	onClose: () => void;
+}
+
+// Компонент модального окна
+const Modal = ({ isOpen, message, onClose }: ModalProps) => {
+	if (!isOpen) return null;
+
+	return (
+		<div className='fixed inset-0 flex items-center justify-center z-50 bg-black/50'>
+			<div className='bg-white rounded-lg p-6 w-[80%] max-w-md'>
+				<p className='text-center mb-6 text-[clamp(1rem,4vw,1.5rem)]'>
+					{message}
+				</p>
+				<div className='flex justify-center'>
+					<button
+						onClick={onClose}
+						className='bg-[#EC3381] text-white py-2 px-8 rounded-lg text-[clamp(1rem,3vw,1.2rem)]'
+					>
+						OK
+					</button>
+				</div>
+			</div>
+		</div>
+	);
+};
+
 const club = { id: 1, name: 'FC Bayern', img_url: './bayern_logo.png' };
 
 const players: Player[] = [
@@ -59,6 +88,26 @@ const Game = () => {
 			Бездарь: [],
 		});
 
+	// Состояние для модального окна
+	const [modal, setModal] = useState({
+		isOpen: false,
+		message: '',
+	});
+
+	const closeModal = () => {
+		setModal({
+			isOpen: false,
+			message: '',
+		});
+	};
+
+	const showModal = (message: string) => {
+		setModal({
+			isOpen: true,
+			message,
+		});
+	};
+
 	const progressPercentage = ((currentPlayer + 1) / players.length) * 100;
 
 	// Функция для добавления игрока в категорию
@@ -68,7 +117,7 @@ const Game = () => {
 
 		// Проверяем, существует ли категория
 		if (!category) {
-			alert('Категория не найдена!');
+			showModal('Категория не найдена!');
 			return;
 		}
 
@@ -76,14 +125,14 @@ const Game = () => {
 		const currentCategoryPlayers = categorizedPlayers[categoryName] || [];
 
 		if (currentCategoryPlayers.length >= category.slots) {
-			alert(`В категории "${categoryName}" больше нет мест!`);
+			showModal(`В категории " ${categoryName.toUpperCase()} " больше нет мест!`);
 			return;
 		}
 
 		// Получаем текущего игрока, проверяем что он существует
 		const playerToAdd = players[currentPlayer];
 		if (!playerToAdd) {
-			alert('Игрок не найден!');
+			showModal('Игрок не найден!');
 			return;
 		}
 
@@ -98,7 +147,7 @@ const Game = () => {
 			setCurrentPlayer(currentPlayer + 1);
 		} else {
 			// Игра закончена
-			alert('Все игроки распределены!');
+			showModal('Все игроки распределены!');
 			// Здесь можно добавить логику для завершения игры или сброса состояния
 		}
 	};
@@ -113,6 +162,12 @@ const Game = () => {
 
 	return (
 		<div className='container flex flex-col justify-around h-full'>
+			<Modal
+				isOpen={modal.isOpen}
+				message={modal.message}
+				onClose={closeModal}
+			/>
+
 			<div className='progress_bar flex flex-col'>
 				<div className='w-full h-2.5 bg-gray-300 rounded-lg flex relative'>
 					<div
