@@ -1,5 +1,3 @@
-import { Link } from 'react-router-dom';
-
 const club = { id: 1, name: 'FC Bayern', img_url: './club_logo.jpg' };
 
 const players = [
