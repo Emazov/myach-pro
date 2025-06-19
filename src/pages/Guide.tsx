@@ -41,7 +41,7 @@ const Guide = () => {
 								{categories.map((category) => (
 									<li
 										key={`category-${category.name}`}
-										className='category_item text-[clamp(1.5rem,4vw,2rem)] font-bold rounded-lg text-white uppercase py-[clamp(0.5rem,1vh,1.5rem)]'
+										className='category_item text-[clamp(1.5rem,4vw,2rem)] font-bold rounded-lg text-white uppercase py-[clamp(0.5rem,1.5vh,1.5rem)]'
 										style={{
 											backgroundColor: category.color,
 										}}
