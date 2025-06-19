@@ -14,8 +14,8 @@ const Guide = () => {
 	const [nextStep, setNextStep] = useState(false);
 
 	return (
-		<div className='container flex flex-col justify-between h-full'>
-			<div className='hero h-full flex flex-col justify-around gap-10'>
+		<div className='container flex flex-col justify-around h-full'>
+			{/* <div className='hero h-full flex flex-col justify-around gap-10'> */}
 				{!nextStep && (
 					<>
 						<div className='guide_item'>
@@ -96,7 +96,7 @@ const Guide = () => {
 						</div>
 					</>
 				)}
-			</div>
+			{/* </div> */}
 			{!nextStep && (
 				<button
 					className='link_btn bg-[#EC3381] border-1 border-[#EC3381] text-white py-[clamp(1rem,2vh,2rem)] text-[clamp(1rem,2vh,1.5rem)]'
