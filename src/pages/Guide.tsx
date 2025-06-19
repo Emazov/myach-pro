@@ -14,13 +14,13 @@ const Guide = () => {
 	const [nextStep, setNextStep] = useState(false);
 
 	return (
-		<div className='container flex flex-col justify-around h-full'>
-			<div className='hero flex flex-col gap-10'>
+		<div className='container flex flex-col justify-between h-full'>
+			<div className='hero h-full flex flex-col justify-around gap-10'>
 				{!nextStep && (
 					<>
 						<div className='guide_item'>
 							<h2 className='text-[clamp(2rem,7vw,3rem)] text-center font-bold mb-4'>
-								Тебе покажем 20 игроков
+								Покажем 20 игроков
 							</h2>
 							<div className='player_list grid grid-cols-10 gap-1'>
 								{players.map((num) => (
@@ -57,7 +57,7 @@ const Guide = () => {
 					<>
 						<div className='guide_item'>
 							<h2 className='text-[clamp(2rem,7vw,3rem)] text-center font-bold mb-4'>
-								У каждой категории ограниченное число мест
+								Ограниченное количество мест
 							</h2>
 							<ul className='category_list flex flex-col gap-2'>
 								{categories.map((category) => (
@@ -90,7 +90,7 @@ const Guide = () => {
 						</div>
 						<div className='guide_item'>
 							<h2 className='text-[clamp(2rem,7vw,3rem)] text-center font-bold'>
-								Если в категории нет места — можно заменить игрока или выбрать
+								Если в категории нет места — замени игрока или выбери
 								другую категорию
 							</h2>
 						</div>
