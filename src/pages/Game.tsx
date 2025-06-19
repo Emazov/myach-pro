@@ -1,4 +1,4 @@
-import React from 'react';
+import { useState } from 'react';
 
 const club = { id: 1, name: 'FC Bayern', img_url: './bayern_logo.png' };
 
@@ -33,7 +33,7 @@ const categories = [
 ];
 
 const Game = () => {
-	const [currentPlayer, setCurrentPlayer] = React.useState(0);
+	const [currentPlayer, _] = useState(0);
 	const progressPercentage = ((currentPlayer + 1) / players.length) * 100;
 
 	return (
