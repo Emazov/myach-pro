@@ -1,3 +1,5 @@
+import React from 'react';
+
 const club = { id: 1, name: 'FC Bayern', img_url: './bayern_logo.png' };
 
 const players = [
@@ -31,38 +33,36 @@ const categories = [
 ];
 
 const Game = () => {
+	const [currentPlayer, setCurrentPlayer] = React.useState(0);
+	const progressPercentage = ((currentPlayer + 1) / players.length) * 100;
+
 	return (
 		<div className='container flex flex-col justify-around h-full'>
-			<div className='progress_bar flex flex-col gap-1'>
+			<div className='progress_bar flex flex-col'>
 				<div className='w-full h-2.5 bg-gray-300 rounded-lg flex relative'>
 					<div
-						className='h-full bg-[linear-gradient(90deg,_#EC3381_10%,_#FFEC13_100%)] rounded-lg relative'
-						style={{ width: `10%` }}
-					>
-						<img
-							src={club.img_url}
-							alt='progress logo'
-							className='absolute -right-2 top-1/2 -translate-y-1/2 w-8'
-						/>
-					</div>
+						className='h-full bg-[linear-gradient(90deg,_#EC3381_10%,_#FFEC13_100%)] rounded-lg'
+						style={{ width: `${progressPercentage}%` }}
+					/>
+					<img
+						src={club.img_url}
+						alt='progress logo'
+						className='absolute top-1/2 -translate-y-1/2 w-8 z-10'
+						style={{ left: `calc(${progressPercentage}% - 16px)` }}
+					/>
 				</div>
-				<div className='text-right text-[clamp(1rem,2vw,2rem)] font-[500]'>
-					{players[0]?.id} / {players.length}
+				<div className='text-right text-[clamp(1rem,2vw,2rem)] font-[500] mt-2'>
+					{players[currentPlayer]?.id} / {players.length}
 				</div>
 			</div>
 			<div className='hero flex flex-col items-center gap-4'>
-				{/* <img
-					src={club.img_url}
-					alt='club'
-					className='rounded-[10rem] w-[clamp(1rem,15vw,10rem)]'
-				/> */}
-				{players[0]?.img_url && (
+				{players[currentPlayer]?.img_url && (
 					<>
 						<h3 className='text-[clamp(1rem,5vw,3rem)] font-[500]'>
-							{players[0]?.name}
+							{players[currentPlayer]?.name}
 						</h3>
 						<img
-							src={players[0]?.img_url}
+							src={players[currentPlayer]?.img_url}
 							alt='player'
 							className='rounded-[2rem] w-[clamp(1rem,50vw,20rem)]'
 						/>
