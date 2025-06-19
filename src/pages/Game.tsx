@@ -33,6 +33,23 @@ const categories = [
 const Game = () => {
 	return (
 		<div className='container flex flex-col justify-around h-full'>
+			<div className='progress_bar flex flex-col gap-1'>
+				<div className='w-full h-2.5 bg-gray-300 rounded-lg flex relative'>
+					<div
+						className='h-full bg-[linear-gradient(90deg,_#EC3381_10%,_#FFEC13_100%)] rounded-lg relative'
+						style={{ width: `10%` }}
+					>
+						<img
+							src='./progress_bar.png'
+							alt='progress logo'
+							className='absolute -right-2 top-1/2 -translate-y-1/2 w-6'
+						/>
+					</div>
+				</div>
+				<div className='text-right text-[clamp(1rem,2vw,2rem)] font-[500]'>
+					{players[0]?.id} / {players.length}
+				</div>
+			</div>
 			<div className='hero flex flex-col items-center gap-4'>
 				<img
 					src={club.img_url}
@@ -56,12 +73,15 @@ const Game = () => {
 				{categories.map((category) => (
 					<li
 						key={`category-${category.name}`}
-						className='category_item text-[clamp(1.5rem,4vw,2rem)] font-bold rounded-lg text-white uppercase py-[clamp(0.5rem,1.5vh,1.5rem)]'
+						className='category_item flex justify-center items-center text-[clamp(1.5rem,4vw,2rem)] font-bold rounded-lg text-white uppercase py-[clamp(0.5rem,1.5vh,1.5rem)]'
 						style={{
 							backgroundColor: category.color,
 						}}
 					>
 						<p>{category.name}</p>
+						<span className='ml-3 text-[clamp(1rem,4vw,3rem)] font-light'>
+							0 / {category.slots}
+						</span>
 					</li>
 				))}
 			</ul>
