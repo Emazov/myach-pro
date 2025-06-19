@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 // Определяем типы данных
 interface Player {
@@ -79,6 +80,7 @@ const categories: Category[] = [
 ];
 
 const Game = () => {
+	const navigate = useNavigate();
 	const [currentPlayer, setCurrentPlayer] = useState(0);
 	const [categorizedPlayers, setCategorizedPlayers] =
 		useState<CategorizedPlayers>({
@@ -125,7 +127,9 @@ const Game = () => {
 		const currentCategoryPlayers = categorizedPlayers[categoryName] || [];
 
 		if (currentCategoryPlayers.length >= category.slots) {
-			showModal(`В категории " ${categoryName.toUpperCase()} " больше нет мест!`);
+			showModal(
+				`В категории " ${categoryName.toUpperCase()} " больше нет мест!`,
+			);
 			return;
 		}
 
@@ -137,18 +141,24 @@ const Game = () => {
 		}
 
 		// Добавляем текущего игрока в категорию
-		setCategorizedPlayers({
+		const updatedCategorizedPlayers = {
 			...categorizedPlayers,
 			[categoryName]: [...currentCategoryPlayers, playerToAdd],
-		});
+		};
+
+		setCategorizedPlayers(updatedCategorizedPlayers);
 
 		// Переходим к следующему игроку, если он есть
 		if (currentPlayer < players.length - 1) {
 			setCurrentPlayer(currentPlayer + 1);
 		} else {
-			// Игра закончена
-			showModal('Все игроки распределены!');
-			// Здесь можно добавить логику для завершения игры или сброса состояния
+			// Игра закончена - перенаправляем на страницу результатов
+			navigate('/results', {
+				state: {
+					categorizedPlayers: updatedCategorizedPlayers,
+					club,
+				},
+			});
 		}
 	};
 

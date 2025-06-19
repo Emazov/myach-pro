@@ -6,6 +6,7 @@ import './App.css';
 import StartPage from './pages/StartPage';
 import Guide from './pages/Guide';
 import Game from './pages/Game';
+import Results from './pages/Results';
 
 function App() {
 	const { tg, initData, user } = useTelegram();
@@ -24,6 +25,7 @@ function App() {
 				<Route index element={<StartPage />} />
 				<Route path='/guide' element={<Guide />} />
 				<Route path='/game' element={<Game />} />
+				<Route path='/results' element={<Results />} />
 			</Routes>
 		</div>
 	);
