@@ -68,7 +68,7 @@ const Guide = () => {
 											backgroundColor: category.color,
 										}}
 									>
-										<p className='category_name text-[clamp(1rem,4vw,2rem)] font-bold text-white text-left uppercase '>
+										<p className='category_name text-[clamp(1rem,5vw,3rem)] font-bold text-white text-left uppercase '>
 											{category.name}
 										</p>
 										<ul className='player_list grid grid-cols-6 gap-2 items-center'>
