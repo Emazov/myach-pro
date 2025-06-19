@@ -30,7 +30,7 @@ const Modal = ({ isOpen, message, onClose }: ModalProps) => {
 
 	return (
 		<div className='fixed inset-0 flex items-center justify-center z-50 bg-black/50'>
-			<div className='bg-[var(--tg-theme-bg-color)] rounded-lg p-6 w-[80%] max-w-md'>
+			<div className='bg-[var(--tg-theme-bg-color)] rounded-lg p-6 w-[80%] max-w-md border-2 border-[var(--tg-theme-text-color)]'>
 				<p className='text-center mb-6 text-[clamp(1rem,4vw,1.5rem)]'>
 					{message}
 				</p>
