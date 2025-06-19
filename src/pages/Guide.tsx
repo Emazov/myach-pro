@@ -63,12 +63,12 @@ const Guide = () => {
 								{categories.map((category) => (
 									<li
 										key={`category-${category.name}`}
-										className='category_item rounded-lg py-[clamp(0.5rem,1vh,1rem)] flex px-[clamp(1rem,2vw,2rem)] justify-between items-center'
+										className='category_item rounded-lg py-[clamp(0.5rem,1vh,1rem)] flex px-[clamp(0.5rem,2vw,2rem)] justify-between items-center'
 										style={{
 											backgroundColor: category.color,
 										}}
 									>
-										<p className='category_name text-[clamp(1.5rem,4vw,2rem)] font-bold text-white text-left uppercase '>
+										<p className='category_name text-[clamp(1rem,4vw,2rem)] font-bold text-white text-left uppercase '>
 											{category.name}
 										</p>
 										<ul className='player_list grid grid-cols-6 gap-2 items-center'>
