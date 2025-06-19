@@ -1,4 +1,4 @@
-const club = { id: 1, name: 'FC Bayern', img_url: './club_logo.jpg' };
+const club = { id: 1, name: 'FC Bayern', img_url: './bayern_logo.png' };
 
 const players = [
 	{ id: 1, name: 'Player 1', img_url: './kane.jpg' },
@@ -40,9 +40,9 @@ const Game = () => {
 						style={{ width: `10%` }}
 					>
 						<img
-							src='./progress_bar.png'
+							src={club.img_url}
 							alt='progress logo'
-							className='absolute -right-2 top-1/2 -translate-y-1/2 w-6'
+							className='absolute -right-2 top-1/2 -translate-y-1/2 w-8'
 						/>
 					</div>
 				</div>
@@ -51,11 +51,11 @@ const Game = () => {
 				</div>
 			</div>
 			<div className='hero flex flex-col items-center gap-4'>
-				<img
+				{/* <img
 					src={club.img_url}
 					alt='club'
 					className='rounded-[10rem] w-[clamp(1rem,15vw,10rem)]'
-				/>
+				/> */}
 				{players[0]?.img_url && (
 					<>
 						<h3 className='text-[clamp(1rem,5vw,3rem)] font-[500]'>
