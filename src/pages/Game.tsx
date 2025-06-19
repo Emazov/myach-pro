@@ -1,94 +1,18 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-
-// Определяем типы данных
-interface Player {
-	id: number;
-	name: string;
-	img_url: string;
-}
-
-interface Category {
-	name: string;
-	color: string;
-	slots: number;
-}
-
-interface CategorizedPlayers {
-	[key: string]: Player[];
-}
-
-interface ModalProps {
-	isOpen: boolean;
-	message: string;
-	onClose: () => void;
-}
-
-// Компонент модального окна
-const Modal = ({ isOpen, message, onClose }: ModalProps) => {
-	if (!isOpen) return null;
-
-	return (
-		<div className='fixed inset-0 flex items-center justify-center z-50 bg-black/50'>
-			<div className='bg-[var(--tg-theme-bg-color)] rounded-lg p-6 w-[80%] max-w-md border-2 border-[var(--tg-theme-text-color)]'>
-				<p className='text-center mb-6 text-[clamp(1rem,4vw,1.5rem)]'>
-					{message}
-				</p>
-				<div className='flex justify-center'>
-					<button
-						onClick={onClose}
-						className='bg-[#EC3381] text-white py-2 px-8 rounded-lg text-[clamp(1rem,3vw,1.2rem)]'
-					>
-						OK
-					</button>
-				</div>
-			</div>
-		</div>
-	);
-};
-
-const club = { id: 1, name: 'FC Bayern', img_url: './bayern_logo.png' };
-
-const players: Player[] = [
-	{ id: 1, name: 'Player 1', img_url: './kane.jpg' },
-	{ id: 2, name: 'Player 2', img_url: './kimich.jpg' },
-	{ id: 3, name: 'Player 3', img_url: './kane.jpg' },
-	{ id: 4, name: 'Player 4', img_url: './kimich.jpg' },
-	{ id: 5, name: 'Player 5', img_url: './kane.jpg' },
-	{ id: 6, name: 'Player 6', img_url: './kimich.jpg' },
-	{ id: 7, name: 'Player 7', img_url: './kane.jpg' },
-	{ id: 8, name: 'Player 8', img_url: './kimich.jpg' },
-	{ id: 9, name: 'Player 9', img_url: './kane.jpg' },
-	{ id: 10, name: 'Player 10', img_url: './kimich.jpg' },
-	{ id: 11, name: 'Player 11', img_url: './kane.jpg' },
-	{ id: 12, name: 'Player 12', img_url: './kimich.jpg' },
-	{ id: 13, name: 'Player 13', img_url: './kane.jpg' },
-	{ id: 14, name: 'Player 14', img_url: './kimich.jpg' },
-	{ id: 15, name: 'Player 15', img_url: './kane.jpg' },
-	{ id: 16, name: 'Player 16', img_url: './kimich.jpg' },
-	{ id: 17, name: 'Player 17', img_url: './kane.jpg' },
-	{ id: 18, name: 'Player 18', img_url: './kimich.jpg' },
-	{ id: 19, name: 'Player 19', img_url: './kane.jpg' },
-	{ id: 20, name: 'Player 20', img_url: './kimich.jpg' },
-];
-
-const categories: Category[] = [
-	{ name: 'goat', color: '#0EA94B', slots: 2 },
-	{ name: 'Хорош', color: '#94CC7A', slots: 6 },
-	{ name: 'норм', color: '#E6A324', slots: 6 },
-	{ name: 'Бездарь', color: '#E13826', slots: 6 },
-];
+import { useGameState } from '../hooks/useGameState';
+import { categories, club, players } from '../constants';
+import { Modal, CategoryItem } from '../components';
 
 const Game = () => {
 	const navigate = useNavigate();
-	const [currentPlayer, setCurrentPlayer] = useState(0);
-	const [categorizedPlayers, setCategorizedPlayers] =
-		useState<CategorizedPlayers>({
-			goat: [],
-			Хорош: [],
-			норм: [],
-			Бездарь: [],
-		});
+	const {
+		currentPlayer,
+		categorizedPlayers,
+		progressPercentage,
+		addPlayerToCategory,
+		getCurrentPlayer,
+	} = useGameState();
 
 	// Состояние для модального окна
 	const [modal, setModal] = useState({
@@ -110,65 +34,38 @@ const Game = () => {
 		});
 	};
 
-	const progressPercentage = ((currentPlayer + 1) / players.length) * 100;
-
 	// Функция для добавления игрока в категорию
-	const addPlayerToCategory = (categoryName: string) => {
-		// Получаем текущую категорию и проверяем, не заполнена ли она уже
-		const category = categories.find((cat) => cat.name === categoryName);
+	const handleCategoryClick = (categoryName: string) => {
+		const result = addPlayerToCategory(categoryName);
 
-		// Проверяем, существует ли категория
-		if (!category) {
-			showModal('Категория не найдена!');
-			return;
-		}
-
-		// Проверяем, существуют ли игроки в этой категории и есть ли свободные места
-		const currentCategoryPlayers = categorizedPlayers[categoryName] || [];
-
-		if (currentCategoryPlayers.length >= category.slots) {
-			showModal(
-				`В категории " ${categoryName.toUpperCase()} " больше нет мест!`,
-			);
-			return;
-		}
-
-		// Получаем текущего игрока, проверяем что он существует
-		const playerToAdd = players[currentPlayer];
-		if (!playerToAdd) {
-			showModal('Игрок не найден!');
-			return;
-		}
-
-		// Добавляем текущего игрока в категорию
-		const updatedCategorizedPlayers = {
-			...categorizedPlayers,
-			[categoryName]: [...currentCategoryPlayers, playerToAdd],
-		};
-
-		setCategorizedPlayers(updatedCategorizedPlayers);
-
-		// Переходим к следующему игроку, если он есть
-		if (currentPlayer < players.length - 1) {
-			setCurrentPlayer(currentPlayer + 1);
-		} else {
-			// Игра закончена - перенаправляем на страницу результатов
-			navigate('/results', {
-				state: {
-					categorizedPlayers: updatedCategorizedPlayers,
-					club,
-				},
-			});
+		switch (result) {
+			case 'category_not_found':
+				showModal('Категория не найдена!');
+				break;
+			case 'category_full':
+				showModal(
+					`В категории " ${categoryName.toUpperCase()} " больше нет мест!`,
+				);
+				break;
+			case 'player_not_found':
+				showModal('Игрок не найден!');
+				break;
+			case 'game_finished':
+				// Игра закончена - перенаправляем на страницу результатов
+				navigate('/results', {
+					state: {
+						categorizedPlayers,
+						club,
+					},
+				});
+				break;
+			case 'success':
+				// Игрок успешно добавлен, продолжаем игру
+				break;
 		}
 	};
 
-	// Расчет заполненности для каждой категории
-	const getCategoryFilled = (categoryName: string) => {
-		const playerCount = categorizedPlayers[categoryName]?.length || 0;
-		const category = categories.find((cat) => cat.name === categoryName);
-		if (!category) return '0 / 0';
-		return `${playerCount} / ${category.slots}`;
-	};
+	const player = getCurrentPlayer();
 
 	return (
 		<div className='container flex flex-col justify-around h-full'>
@@ -195,35 +92,30 @@ const Game = () => {
 					{currentPlayer + 1} / {players.length}
 				</div>
 			</div>
+
 			<div className='hero flex flex-col items-center gap-4'>
-				{players[currentPlayer]?.img_url && (
+				{player?.img_url && (
 					<>
 						<h3 className='text-[clamp(1rem,5vw,3rem)] font-[500]'>
-							{players[currentPlayer]?.name}
+							{player.name}
 						</h3>
 						<img
-							src={players[currentPlayer]?.img_url}
+							src={player.img_url}
 							alt='player'
 							className='rounded-[2rem] w-[clamp(1rem,50vw,20rem)]'
 						/>
 					</>
 				)}
 			</div>
+
 			<ul className='category_list text-center flex flex-col gap-2'>
 				{categories.map((category) => (
-					<li
+					<CategoryItem
 						key={`category-${category.name}`}
-						className='category_item flex justify-center items-center text-[clamp(1.5rem,4vw,2rem)] font-bold rounded-lg text-white uppercase py-[clamp(0.5rem,1.5vh,1.5rem)] cursor-pointer'
-						style={{
-							backgroundColor: category.color,
-						}}
-						onClick={() => addPlayerToCategory(category.name)}
-					>
-						<p>{category.name}</p>
-						<span className='ml-3 text-[clamp(1rem,4vw,3rem)] font-light'>
-							{getCategoryFilled(category.name)}
-						</span>
-					</li>
+						category={category}
+						players={categorizedPlayers[category.name] || []}
+						onClick={() => handleCategoryClick(category.name)}
+					/>
 				))}
 			</ul>
 		</div>

@@ -1,26 +1,7 @@
 import { useLocation, useNavigate } from 'react-router-dom';
-
-// Определяем типы данных
-interface Player {
-	id: number;
-	name: string;
-	img_url: string;
-}
-
-interface Club {
-	id: number;
-	name: string;
-	img_url: string;
-}
-
-interface CategorizedPlayers {
-	[key: string]: Player[];
-}
-
-interface LocationState {
-	categorizedPlayers: CategorizedPlayers;
-	club: Club;
-}
+import type { LocationState } from '../types';
+import { categories } from '../constants';
+import { CategoryItem } from '../components';
 
 const Results = () => {
 	const location = useLocation();
@@ -29,14 +10,6 @@ const Results = () => {
 		categorizedPlayers: {},
 		club: { id: 0, name: '', img_url: '' },
 	};
-
-	// Получаем все категории из объекта categorizedPlayers
-	const categories = [
-		{ name: 'goat', color: '#0EA94B', slots: 2 },
-		{ name: 'Хорош', color: '#94CC7A', slots: 6 },
-		{ name: 'норм', color: '#E6A324', slots: 6 },
-		{ name: 'Бездарь', color: '#E13826', slots: 6 },
-	];
 
 	const handleNewGame = () => {
 		navigate('/game');
@@ -66,31 +39,12 @@ const Results = () => {
 				{categories.map((category) => {
 					const players = categorizedPlayers[category.name] || [];
 					return (
-						<li
+						<CategoryItem
 							key={`category-${category.name}`}
-							className='category_item rounded-md py-[clamp(0.2rem,0.5vh,1rem)] flex px-[clamp(0.2rem,0.5vh,1rem)] justify-between items-center'
-							style={{
-								backgroundColor: category.color,
-							}}
-						>
-							<p className='ml-1 category_name text-[clamp(1rem,4vw,4rem)] font-bold text-white text-left uppercase '>
-								{category.name}
-							</p>
-							<ul className='player_list grid grid-cols-6 gap-1 items-center'>
-								{players.map((player) => (
-									<li
-										className='player_item flex items-center justify-center   rounded-lg w-[clamp(2.5rem,4vw,4rem)]'
-										key={`slot-${player.id}`}
-									>
-										<img
-											src={player.img_url}
-											alt={player.name}
-											className='object-cover rounded-sm'
-										/>
-									</li>
-								))}
-							</ul>
-						</li>
+							category={category}
+							players={players}
+							showPlayerImages={true}
+						/>
 					);
 				})}
 			</ul>
