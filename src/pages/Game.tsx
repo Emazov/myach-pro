@@ -1,8 +1,25 @@
 import { useState } from 'react';
 
+// Определяем типы данных
+interface Player {
+	id: number;
+	name: string;
+	img_url: string;
+}
+
+interface Category {
+	name: string;
+	color: string;
+	slots: number;
+}
+
+interface CategorizedPlayers {
+	[key: string]: Player[];
+}
+
 const club = { id: 1, name: 'FC Bayern', img_url: './bayern_logo.png' };
 
-const players = [
+const players: Player[] = [
 	{ id: 1, name: 'Player 1', img_url: './kane.jpg' },
 	{ id: 2, name: 'Player 2', img_url: './kimich.jpg' },
 	{ id: 3, name: 'Player 3', img_url: './kane.jpg' },
@@ -25,7 +42,7 @@ const players = [
 	{ id: 20, name: 'Player 20', img_url: './kimich.jpg' },
 ];
 
-const categories = [
+const categories: Category[] = [
 	{ name: 'goat', color: '#0EA94B', slots: 2 },
 	{ name: 'Хорош', color: '#94CC7A', slots: 6 },
 	{ name: 'норм', color: '#E6A324', slots: 6 },
@@ -33,8 +50,66 @@ const categories = [
 ];
 
 const Game = () => {
-	const [currentPlayer, _] = useState(0);
+	const [currentPlayer, setCurrentPlayer] = useState(0);
+	const [categorizedPlayers, setCategorizedPlayers] =
+		useState<CategorizedPlayers>({
+			goat: [],
+			Хорош: [],
+			норм: [],
+			Бездарь: [],
+		});
+
 	const progressPercentage = ((currentPlayer + 1) / players.length) * 100;
+
+	// Функция для добавления игрока в категорию
+	const addPlayerToCategory = (categoryName: string) => {
+		// Получаем текущую категорию и проверяем, не заполнена ли она уже
+		const category = categories.find((cat) => cat.name === categoryName);
+
+		// Проверяем, существует ли категория
+		if (!category) {
+			alert('Категория не найдена!');
+			return;
+		}
+
+		// Проверяем, существуют ли игроки в этой категории и есть ли свободные места
+		const currentCategoryPlayers = categorizedPlayers[categoryName] || [];
+
+		if (currentCategoryPlayers.length >= category.slots) {
+			alert(`В категории "${categoryName}" больше нет мест!`);
+			return;
+		}
+
+		// Получаем текущего игрока, проверяем что он существует
+		const playerToAdd = players[currentPlayer];
+		if (!playerToAdd) {
+			alert('Игрок не найден!');
+			return;
+		}
+
+		// Добавляем текущего игрока в категорию
+		setCategorizedPlayers({
+			...categorizedPlayers,
+			[categoryName]: [...currentCategoryPlayers, playerToAdd],
+		});
+
+		// Переходим к следующему игроку, если он есть
+		if (currentPlayer < players.length - 1) {
+			setCurrentPlayer(currentPlayer + 1);
+		} else {
+			// Игра закончена
+			alert('Все игроки распределены!');
+			// Здесь можно добавить логику для завершения игры или сброса состояния
+		}
+	};
+
+	// Расчет заполненности для каждой категории
+	const getCategoryFilled = (categoryName: string) => {
+		const playerCount = categorizedPlayers[categoryName]?.length || 0;
+		const category = categories.find((cat) => cat.name === categoryName);
+		if (!category) return '0 / 0';
+		return `${playerCount} / ${category.slots}`;
+	};
 
 	return (
 		<div className='container flex flex-col justify-around h-full'>
@@ -52,7 +127,7 @@ const Game = () => {
 					/>
 				</div>
 				<div className='text-right text-[clamp(1rem,2vw,2rem)] font-[500] mt-2'>
-					{players[currentPlayer]?.id} / {players.length}
+					{currentPlayer + 1} / {players.length}
 				</div>
 			</div>
 			<div className='hero flex flex-col items-center gap-4'>
@@ -73,14 +148,15 @@ const Game = () => {
 				{categories.map((category) => (
 					<li
 						key={`category-${category.name}`}
-						className='category_item flex justify-center items-center text-[clamp(1.5rem,4vw,2rem)] font-bold rounded-lg text-white uppercase py-[clamp(0.5rem,1.5vh,1.5rem)]'
+						className='category_item flex justify-center items-center text-[clamp(1.5rem,4vw,2rem)] font-bold rounded-lg text-white uppercase py-[clamp(0.5rem,1.5vh,1.5rem)] cursor-pointer'
 						style={{
 							backgroundColor: category.color,
 						}}
+						onClick={() => addPlayerToCategory(category.name)}
 					>
 						<p>{category.name}</p>
 						<span className='ml-3 text-[clamp(1rem,4vw,3rem)] font-light'>
-							0 / {category.slots}
+							{getCategoryFilled(category.name)}
 						</span>
 					</li>
 				))}
