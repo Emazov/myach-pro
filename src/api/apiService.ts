@@ -88,6 +88,7 @@ export const authenticateTelegramUser = async (
 			},
 			body: JSON.stringify({ initData }),
 		});
+		
 
 		if (response.status === 401 || response.status === 403) {
 			// Неавторизованный или запрещенный доступ
