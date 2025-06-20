@@ -25,7 +25,7 @@ const Modal = ({
 	if (mode === 'replace_player') {
 		return (
 			<div className='fixed container inset-0 flex items-end z-50 bg-black/50'>
-				<div className='bg-[var(--tg-theme-bg-color)] border-2 rounded-lg border-black p-6 w-full max-h-[80vh] overflow-y-auto'>
+				<div className='bg-[var(--tg-theme-bg-color)] border-2 rounded-lg border-[var(--tg-theme-text-color)init] p-6 w-full max-h-[80vh] overflow-y-auto'>
 					<h3 className='text-center text-[clamp(1rem,4vw,1.5rem)] font-semibold'>
 						В категории "{categoryName?.toUpperCase()}" больше нет мест!
 					</h3>
