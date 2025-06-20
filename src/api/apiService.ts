@@ -1,7 +1,6 @@
 import type { Category, Club, Player } from '../types';
 
-const API_URL = 'http://94.130.231.234:3001/api';
-// const API_URL = 'http://localhost:7001/api';
+const API_URL = `http://localhost:7001/api`;
 
 // Функция для преобразования полей из camelCase в snake_case
 const transformResponseToSnakeCase = <T>(data: any[]): T[] => {
