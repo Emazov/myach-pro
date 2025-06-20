@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
-import type { CategorizedPlayers, Player } from '../types';
-import { categories, players } from '../constants';
+import type { CategorizedPlayers, Player, Category } from '../types';
+import { fetchCategories, fetchPlayers } from '../api';
 
 type AddPlayerResult =
 	| 'success'
@@ -16,6 +16,9 @@ interface GameState {
 	categorizedPlayers: CategorizedPlayers;
 	playerQueue: Player[];
 	processedPlayersCount: number;
+	categories: Category[];
+	isLoading: boolean;
+	error: string | null;
 
 	// Computed values
 	progressPercentage: number;
@@ -29,20 +32,18 @@ interface GameState {
 	getCategoryFilled: (categoryName: string) => string;
 	getCurrentPlayer: () => Player | undefined;
 	resetGame: () => void;
-	initializeGame: () => void;
+	initializeGame: () => Promise<void>;
 }
 
 const initialState = {
 	currentPlayerIndex: 0,
-	categorizedPlayers: {
-		goat: [],
-		Хорош: [],
-		норм: [],
-		Бездарь: [],
-	} as CategorizedPlayers,
-	playerQueue: [...players],
+	categorizedPlayers: {} as CategorizedPlayers,
+	playerQueue: [],
 	processedPlayersCount: 0,
 	progressPercentage: 0,
+	categories: [],
+	isLoading: false,
+	error: null,
 };
 
 export const useGameStore = create<GameState>()(
@@ -54,7 +55,9 @@ export const useGameStore = create<GameState>()(
 				// Actions
 				addPlayerToCategory: (categoryName: string): AddPlayerResult => {
 					const state = get();
-					const category = categories.find((cat) => cat.name === categoryName);
+					const category = state.categories.find(
+						(cat) => cat.name === categoryName,
+					);
 
 					if (!category) {
 						return 'category_not_found';
@@ -79,7 +82,8 @@ export const useGameStore = create<GameState>()(
 
 					const newProcessedCount = state.processedPlayersCount + 1;
 					const newCurrentIndex = state.currentPlayerIndex + 1;
-					const newProgressPercentage = (newProcessedCount / 20) * 100;
+					const newProgressPercentage =
+						(newProcessedCount / state.playerQueue.length) * 100;
 
 					set({
 						categorizedPlayers: updatedCategorizedPlayers,
@@ -89,7 +93,7 @@ export const useGameStore = create<GameState>()(
 					});
 
 					// Проверяем завершение игры
-					if (newProcessedCount >= 20) {
+					if (newProcessedCount >= state.playerQueue.length) {
 						return 'game_finished';
 					}
 
@@ -128,7 +132,7 @@ export const useGameStore = create<GameState>()(
 					});
 
 					// При замене игрока проверяем завершение по текущему счетчику
-					if (state.processedPlayersCount >= 20) {
+					if (state.processedPlayersCount >= state.playerQueue.length) {
 						return 'game_finished';
 					}
 
@@ -139,7 +143,9 @@ export const useGameStore = create<GameState>()(
 					const state = get();
 					const playerCount =
 						state.categorizedPlayers[categoryName]?.length || 0;
-					const category = categories.find((cat) => cat.name === categoryName);
+					const category = state.categories.find(
+						(cat) => cat.name === categoryName,
+					);
 					if (!category) return '0 / 0';
 					return `${playerCount} / ${category.slots}`;
 				},
@@ -150,17 +156,50 @@ export const useGameStore = create<GameState>()(
 				},
 
 				resetGame: () => {
+					const state = get();
 					set({
 						...initialState,
-						playerQueue: [...players],
+						categories: state.categories,
+						isLoading: false,
+						playerQueue: [...state.playerQueue],
+						categorizedPlayers: Object.fromEntries(
+							state.categories.map((cat) => [cat.name, []]),
+						),
 					});
 				},
 
-				initializeGame: () => {
-					set({
-						...initialState,
-						playerQueue: [...players],
-					});
+				initializeGame: async () => {
+					set({ isLoading: true, error: null });
+
+					try {
+						// Загружаем категории и игроков с сервера
+						const [categories, players] = await Promise.all([
+							fetchCategories(),
+							fetchPlayers(),
+						]);
+
+						// Создаем начальное состояние категорий
+						const emptyCategorizedPlayers = Object.fromEntries(
+							categories.map((cat) => [cat.name, []]),
+						);
+
+						set({
+							categories,
+							playerQueue: players,
+							categorizedPlayers: emptyCategorizedPlayers,
+							currentPlayerIndex: 0,
+							processedPlayersCount: 0,
+							progressPercentage: 0,
+							isLoading: false,
+						});
+					} catch (error) {
+						console.error('Ошибка при инициализации игры:', error);
+						set({
+							error:
+								'Произошла ошибка при загрузке данных. Проверьте соединение с сервером.',
+							isLoading: false,
+						});
+					}
 				},
 			}),
 			{
@@ -170,6 +209,7 @@ export const useGameStore = create<GameState>()(
 					currentPlayerIndex: state.currentPlayerIndex,
 					processedPlayersCount: state.processedPlayersCount,
 					progressPercentage: state.progressPercentage,
+					categories: state.categories,
 				}),
 			},
 		),

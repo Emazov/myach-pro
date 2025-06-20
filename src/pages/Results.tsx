@@ -1,11 +1,35 @@
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useGameStore } from '../store';
-import { categories, club } from '../constants';
 import { CategoryItem } from '../components';
+import { fetchClubs } from '../api';
 
 const Results = () => {
 	const navigate = useNavigate();
-	const { categorizedPlayers, resetGame } = useGameStore();
+	const { categorizedPlayers, resetGame, categories } = useGameStore();
+	const [club, setClub] = useState<any>(null);
+	const [isLoading, setIsLoading] = useState(true);
+	const [error, setError] = useState<string | null>(null);
+
+	useEffect(() => {
+		const loadClub = async () => {
+			try {
+				const clubs = await fetchClubs();
+				if (clubs && clubs.length > 0) {
+					setClub(clubs[0]);
+				} else {
+					setError('Не удалось загрузить информацию о клубе');
+				}
+			} catch (err) {
+				console.error('Ошибка при загрузке данных о клубе:', err);
+				setError('Ошибка при загрузке данных о клубе');
+			} finally {
+				setIsLoading(false);
+			}
+		};
+
+		loadClub();
+	}, []);
 
 	const handleNewGame = () => {
 		resetGame();
@@ -15,6 +39,32 @@ const Results = () => {
 	const handleGoHome = () => {
 		navigate('/');
 	};
+
+	// Показываем загрузку, если данные еще не получены
+	if (isLoading) {
+		return (
+			<div className='container flex flex-col items-center justify-center h-full'>
+				<div className='text-2xl font-bold'>Загрузка...</div>
+			</div>
+		);
+	}
+
+	// Показываем ошибку, если что-то пошло не так
+	if (error || !club) {
+		return (
+			<div className='container flex flex-col items-center justify-center h-full'>
+				<div className='text-2xl font-bold text-red-500'>
+					{error || 'Произошла ошибка при загрузке данных'}
+				</div>
+				<button
+					className='mt-4 px-4 py-2 bg-blue-500 text-white rounded'
+					onClick={() => window.location.reload()}
+				>
+					Обновить страницу
+				</button>
+			</div>
+		);
+	}
 
 	return (
 		<div className='container mx-auto px-4 py-8'>

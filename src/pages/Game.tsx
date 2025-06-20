@@ -1,11 +1,13 @@
-import React from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useGameStore, useModalStore } from '../store';
-import { categories, club } from '../constants';
 import { Modal, CategoryItem } from '../components';
+import { fetchClubs } from '../api';
 
 const Game = () => {
 	const navigate = useNavigate();
+	const [club, setClub] = useState<any>(null);
+	const [loadingClub, setLoadingClub] = useState(true);
 
 	// Zustand stores
 	const {
@@ -16,6 +18,10 @@ const Game = () => {
 		replacePlayerInCategory,
 		getCurrentPlayer,
 		initializeGame,
+		categories,
+		isLoading,
+		error,
+		playerQueue,
 	} = useGameStore();
 
 	const {
@@ -29,10 +35,30 @@ const Game = () => {
 		closeModal,
 	} = useModalStore();
 
-	// Инициализация игры при загрузке компонента
-	React.useEffect(() => {
-		initializeGame();
-	}, [initializeGame]);
+	// Загрузка клуба и инициализация игры при загрузке компонента
+	useEffect(() => {
+		const loadData = async () => {
+			try {
+				// Загружаем данные игры
+				await initializeGame();
+
+				// Загружаем информацию о клубе
+				const clubs = await fetchClubs();
+				if (clubs && clubs.length > 0) {
+					setClub(clubs[0]);
+				}
+			} catch (err) {
+				console.error('Ошибка при загрузке данных:', err);
+				showMessageModal(
+					'Ошибка при загрузке данных. Пожалуйста, обновите страницу.',
+				);
+			} finally {
+				setLoadingClub(false);
+			}
+		};
+
+		loadData();
+	}, [initializeGame, showMessageModal]);
 
 	// Функция для добавления игрока в категорию
 	const handleCategoryClick = (categoryName: string) => {
@@ -75,9 +101,36 @@ const Game = () => {
 	// Обработчик выбора другой категории
 	const handleChooseOtherCategory = () => {
 		// Просто закрываем модалку и позволяем выбрать другую категорию
+		closeModal();
 	};
 
 	const player = getCurrentPlayer();
+
+	// Показываем загрузку, если данные еще не получены
+	if (isLoading || loadingClub) {
+		return (
+			<div className='container flex flex-col items-center justify-center h-full'>
+				<div className='text-2xl font-bold'>Загрузка...</div>
+			</div>
+		);
+	}
+
+	// Показываем ошибку, если что-то пошло не так
+	if (error || !club) {
+		return (
+			<div className='container flex flex-col items-center justify-center h-full'>
+				<div className='text-2xl font-bold text-red-500'>
+					Произошла ошибка при загрузке данных
+				</div>
+				<button
+					className='mt-4 px-4 py-2 bg-blue-500 text-white rounded'
+					onClick={() => window.location.reload()}
+				>
+					Обновить страницу
+				</button>
+			</div>
+		);
+	}
 
 	return (
 		<div className='container flex flex-col justify-around h-full'>
@@ -106,7 +159,7 @@ const Game = () => {
 					/>
 				</div>
 				<div className='text-right text-[clamp(1rem,2vw,2rem)] font-[500] mt-2'>
-					{processedPlayersCount} / 20
+					{processedPlayersCount} / {playerQueue.length}
 				</div>
 			</div>
 
