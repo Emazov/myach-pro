@@ -25,7 +25,7 @@ const Modal = ({
 	if (mode === 'replace_player') {
 		return (
 			<div className='fixed inset-0 flex items-end z-50 bg-black/50'>
-				<div className='bg-[var(--tg-theme-bg-color)] rounded-lg p-6 w-full max-h-[80vh] overflow-y-auto'>
+				<div className='bg-[var(--tg-theme-bg-color)] border-2 border-[var(--tg-theme-text-color)] rounded-lg p-6 w-full max-h-[80vh] overflow-y-auto'>
 					<h3 className='text-center text-[clamp(1rem,4vw,1.5rem)] font-semibold'>
 						В категории "{categoryName?.toUpperCase()}" больше нет мест!
 					</h3>
@@ -51,7 +51,7 @@ const Modal = ({
 						))}
 					</div>
 
-					<div className='flex flex-col mt-4 mb-[clamp(1rem,1.5vh,1rem)]'>
+					<div className='flex flex-col mt-4 mb-5'>
 						<button
 							onClick={handleChooseOtherCategory}
 							className='link_btn border-1 border-[#EC3381] text-[#EC3381] py-[clamp(1rem,1vw,1rem)] text-[clamp(1rem,2vh,1.5rem)]'
