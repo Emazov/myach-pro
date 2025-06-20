@@ -23,6 +23,8 @@ function App() {
 				console.error('Ошибка при аутентификации:', error);
 			});
 		}
+
+		console.log(initData);
 	}, [tg, initData, authenticateUser]);
 
 	return (
