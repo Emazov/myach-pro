@@ -1,4 +1,4 @@
-import type { Category, Club, Player } from '../types';
+import type { Category, Club, Player, User } from '../types';
 
 const API_URL = `http://localhost:7001/api`;
 
@@ -69,6 +69,40 @@ export const fetchPlayers = async (): Promise<Player[]> => {
 		return transformResponseToSnakeCase<Player>(playersData);
 	} catch (error) {
 		console.error('Ошибка при запросе игроков:', error);
+		throw error;
+	}
+};
+
+/**
+ * Аутентифицировать пользователя через Telegram
+ * Отправляет initData на сервер для проверки и получения информации о пользователе
+ */
+export const authenticateTelegramUser = async (
+	initData: string,
+): Promise<User | null> => {
+	try {
+		const response = await fetch(`${API_URL}/auth/auth`, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify({ initData }),
+		});
+
+		if (response.status === 401 || response.status === 403) {
+			// Неавторизованный или запрещенный доступ
+			return null;
+		}
+
+		if (!response.ok) {
+			throw new Error(
+				`Ошибка при аутентификации пользователя: ${response.status}`,
+			);
+		}
+
+		return await response.json();
+	} catch (error) {
+		console.error('Ошибка при аутентификации пользователя:', error);
 		throw error;
 	}
 };

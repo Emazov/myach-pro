@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { useTelegram } from './hooks/useTelegram';
+import { useUserStore } from './store';
 import { Routes, Route } from 'react-router-dom';
 import './App.css';
 
@@ -9,15 +10,20 @@ import Game from './pages/Game';
 import Results from './pages/Results';
 
 function App() {
-	const { tg, initData, user } = useTelegram();
+	const { tg, initData } = useTelegram();
+	const { authenticateUser } = useUserStore();
 
 	useEffect(() => {
 		tg.ready();
 		tg.expand();
-	}, []);
 
-	console.log(initData);
-	console.log(user);
+		// Если есть initData, отправляем его на сервер для аутентификации
+		if (initData) {
+			authenticateUser(initData).catch((error) => {
+				console.error('Ошибка при аутентификации:', error);
+			});
+		}
+	}, [tg, initData, authenticateUser]);
 
 	return (
 		<div className='w-full h-screen'>

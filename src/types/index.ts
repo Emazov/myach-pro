@@ -38,3 +38,11 @@ export interface ModalProps {
 	onReplacePlayer?: (player: Player) => void;
 	onChooseOtherCategory?: () => void;
 }
+
+export type UserRole = 'Admin' | 'User';
+
+export interface User {
+	id: number;
+	telegramId: number;
+	role: UserRole;
+}
