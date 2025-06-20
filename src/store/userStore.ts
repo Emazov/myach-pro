@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
-import { User, UserRole } from '../types';
+import type { User } from '../types';
 import { authenticateTelegramUser } from '../api';
 
 interface UserState {
@@ -18,7 +18,7 @@ interface UserState {
 export const useUserStore = create<UserState>()(
 	devtools(
 		persist(
-			(set, get) => ({
+			(set) => ({
 				telegramId: null,
 				user: null,
 				isAdmin: false,
