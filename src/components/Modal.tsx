@@ -25,33 +25,33 @@ const Modal = ({
 	if (mode === 'replace_player') {
 		return (
 			<div className='fixed inset-0 flex items-end z-50 bg-black/50'>
-				<div className='bg-white rounded-lg p-6 w-full max-h-[80vh] overflow-y-auto'>
-					<h3 className='text-center mb-4 text-[clamp(1rem,4vw,1.5rem)] font-semibold'>
+				<div className='bg-white bg-[var(--tg-theme-bg-color)] rounded-lg p-6 w-full max-h-[80vh] overflow-y-auto'>
+					<h3 className='text-center text-[clamp(1rem,4vw,1.5rem)] font-semibold'>
 						В категории "{categoryName?.toUpperCase()}" больше нет мест!
 					</h3>
-					<p className='text-center mb-6 text-[clamp(0.9rem,3vw,1.2rem)]'>
+					<p className='text-center my-4 text-[clamp(0.9rem,3vw,1.2rem)]'>
 						Выберите игрока для замены:
 					</p>
 
 					{/* Сетка игроков */}
-					<div className='grid grid-cols-3 gap-3 mb-6'>
+					<div className='grid grid-cols-3 gap-3'>
 						{players.map((player) => (
 							<button
 								key={player.id}
 								onClick={() => handleReplacePlayer(player)}
-								className='flex flex-col items-center p-2 rounded-lg hover:bg-gray-100 transition-colors'
+								className='flex flex-col items-center rounded-lg'
 							>
 								<img
 									src={player.img_url}
 									alt={player.name}
-									className='w-16 h-16 object-cover rounded-lg mb-2'
+									className='w-16 object-cover rounded-lg mb-2'
 								/>
 								<span className='text-sm text-center'>{player.name}</span>
 							</button>
 						))}
 					</div>
 
-					<div className='flex flex-col gap-2'>
+					<div className='flex flex-col mt-4 mb-[clamp(1rem,1.5vh,1rem)]'>
 						<button
 							onClick={handleChooseOtherCategory}
 							className='link_btn border-1 border-[#EC3381] text-[#EC3381] py-[clamp(1rem,1vw,1rem)] text-[clamp(1rem,2vh,1.5rem)]'
