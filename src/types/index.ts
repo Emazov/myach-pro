@@ -25,8 +25,15 @@ export interface LocationState {
 	club: Club;
 }
 
+export type ModalMode = 'message' | 'replace_player';
+
 export interface ModalProps {
 	isOpen: boolean;
-	message: string;
+	mode: ModalMode;
+	message?: string;
+	categoryName?: string;
+	players?: Player[];
 	onClose: () => void;
+	onReplacePlayer?: (player: Player) => void;
+	onChooseOtherCategory?: () => void;
 }

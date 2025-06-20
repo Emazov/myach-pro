@@ -1,38 +1,38 @@
-import { useState } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useGameState } from '../hooks/useGameState';
+import { useGameStore, useModalStore } from '../store';
 import { categories, club, players } from '../constants';
 import { Modal, CategoryItem } from '../components';
 
 const Game = () => {
 	const navigate = useNavigate();
+
+	// Zustand stores
 	const {
-		currentPlayer,
+		currentPlayerIndex,
 		categorizedPlayers,
 		progressPercentage,
 		addPlayerToCategory,
+		replacePlayerInCategory,
 		getCurrentPlayer,
-	} = useGameState();
+		initializeGame,
+	} = useGameStore();
 
-	// Состояние для модального окна
-	const [modal, setModal] = useState({
-		isOpen: false,
-		message: '',
-	});
+	const {
+		isOpen,
+		mode,
+		message,
+		categoryName,
+		players: modalPlayers,
+		showMessageModal,
+		showReplacePlayerModal,
+		closeModal,
+	} = useModalStore();
 
-	const closeModal = () => {
-		setModal({
-			isOpen: false,
-			message: '',
-		});
-	};
-
-	const showModal = (message: string) => {
-		setModal({
-			isOpen: true,
-			message,
-		});
-	};
+	// Инициализация игры при загрузке компонента
+	React.useEffect(() => {
+		initializeGame();
+	}, [initializeGame]);
 
 	// Функция для добавления игрока в категорию
 	const handleCategoryClick = (categoryName: string) => {
@@ -40,24 +40,19 @@ const Game = () => {
 
 		switch (result) {
 			case 'category_not_found':
-				showModal('Категория не найдена!');
+				showMessageModal('Категория не найдена!');
 				break;
 			case 'category_full':
-				showModal(
-					`В категории " ${categoryName.toUpperCase()} " больше нет мест!`,
-				);
+				// Показываем модалку с заменой игроков
+				const categoryPlayers = categorizedPlayers[categoryName] || [];
+				showReplacePlayerModal(categoryName, categoryPlayers);
 				break;
 			case 'player_not_found':
-				showModal('Игрок не найден!');
+				showMessageModal('Игрок не найден!');
 				break;
 			case 'game_finished':
 				// Игра закончена - перенаправляем на страницу результатов
-				navigate('/results', {
-					state: {
-						categorizedPlayers,
-						club,
-					},
-				});
+				navigate('/results');
 				break;
 			case 'success':
 				// Игрок успешно добавлен, продолжаем игру
@@ -65,14 +60,31 @@ const Game = () => {
 		}
 	};
 
+	// Обработчик замены игрока
+	const handleReplacePlayer = (playerToReplace: any) => {
+		if (categoryName) {
+			replacePlayerInCategory(categoryName, playerToReplace);
+		}
+	};
+
+	// Обработчик выбора другой категории
+	const handleChooseOtherCategory = () => {
+		// Просто закрываем модалку и позволяем выбрать другую категорию
+	};
+
 	const player = getCurrentPlayer();
 
 	return (
 		<div className='container flex flex-col justify-around h-full'>
 			<Modal
-				isOpen={modal.isOpen}
-				message={modal.message}
+				isOpen={isOpen}
+				mode={mode}
+				message={message}
+				categoryName={categoryName}
+				players={modalPlayers}
 				onClose={closeModal}
+				onReplacePlayer={handleReplacePlayer}
+				onChooseOtherCategory={handleChooseOtherCategory}
 			/>
 
 			<div className='progress_bar flex flex-col'>
@@ -89,7 +101,7 @@ const Game = () => {
 					/>
 				</div>
 				<div className='text-right text-[clamp(1rem,2vw,2rem)] font-[500] mt-2'>
-					{currentPlayer + 1} / {players.length}
+					{currentPlayerIndex + 1} / {players.length}
 				</div>
 			</div>
 

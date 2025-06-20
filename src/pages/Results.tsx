@@ -1,17 +1,14 @@
-import { useLocation, useNavigate } from 'react-router-dom';
-import type { LocationState } from '../types';
-import { categories } from '../constants';
+import { useNavigate } from 'react-router-dom';
+import { useGameStore } from '../store';
+import { categories, club } from '../constants';
 import { CategoryItem } from '../components';
 
 const Results = () => {
-	const location = useLocation();
 	const navigate = useNavigate();
-	const { categorizedPlayers, club } = (location.state as LocationState) || {
-		categorizedPlayers: {},
-		club: { id: 0, name: '', img_url: '' },
-	};
+	const { categorizedPlayers, resetGame } = useGameStore();
 
 	const handleNewGame = () => {
+		resetGame();
 		navigate('/game');
 	};
 
