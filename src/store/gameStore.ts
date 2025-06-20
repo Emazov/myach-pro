@@ -19,6 +19,7 @@ interface GameState {
 	categories: Category[];
 	isLoading: boolean;
 	error: string | null;
+	maxPlayersToProcess: number; // Новое поле, определяющее максимальное количество игроков для обработки
 
 	// Computed values
 	progressPercentage: number;
@@ -44,6 +45,7 @@ const initialState = {
 	categories: [],
 	isLoading: false,
 	error: null,
+	maxPlayersToProcess: 0,
 };
 
 export const useGameStore = create<GameState>()(
@@ -83,7 +85,7 @@ export const useGameStore = create<GameState>()(
 					const newProcessedCount = state.processedPlayersCount + 1;
 					const newCurrentIndex = state.currentPlayerIndex + 1;
 					const newProgressPercentage =
-						(newProcessedCount / state.playerQueue.length) * 100;
+						(newProcessedCount / state.maxPlayersToProcess) * 100;
 
 					set({
 						categorizedPlayers: updatedCategorizedPlayers,
@@ -93,7 +95,7 @@ export const useGameStore = create<GameState>()(
 					});
 
 					// Проверяем завершение игры
-					if (newProcessedCount >= state.playerQueue.length) {
+					if (newProcessedCount >= state.maxPlayersToProcess) {
 						return 'game_finished';
 					}
 
@@ -132,7 +134,7 @@ export const useGameStore = create<GameState>()(
 					});
 
 					// При замене игрока проверяем завершение по текущему счетчику
-					if (state.processedPlayersCount >= state.playerQueue.length) {
+					if (state.processedPlayersCount >= state.maxPlayersToProcess) {
 						return 'game_finished';
 					}
 
@@ -162,6 +164,7 @@ export const useGameStore = create<GameState>()(
 						categories: state.categories,
 						isLoading: false,
 						playerQueue: [...state.playerQueue],
+						maxPlayersToProcess: state.playerQueue.length,
 						categorizedPlayers: Object.fromEntries(
 							state.categories.map((cat) => [cat.name, []]),
 						),
@@ -190,6 +193,7 @@ export const useGameStore = create<GameState>()(
 							currentPlayerIndex: 0,
 							processedPlayersCount: 0,
 							progressPercentage: 0,
+							maxPlayersToProcess: players.length,
 							isLoading: false,
 						});
 					} catch (error) {
@@ -210,6 +214,7 @@ export const useGameStore = create<GameState>()(
 					processedPlayersCount: state.processedPlayersCount,
 					progressPercentage: state.progressPercentage,
 					categories: state.categories,
+					maxPlayersToProcess: state.maxPlayersToProcess,
 				}),
 			},
 		),

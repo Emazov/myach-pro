@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useGameStore, useModalStore } from '../store';
 import { Modal, CategoryItem } from '../components';
@@ -6,8 +6,8 @@ import { fetchClubs } from '../api';
 
 const Game = () => {
 	const navigate = useNavigate();
-	const [club, setClub] = useState<any>(null);
-	const [loadingClub, setLoadingClub] = useState(true);
+	const [club, setClub] = React.useState<any>(null);
+	const [loadingClub, setLoadingClub] = React.useState(true);
 
 	// Zustand stores
 	const {
@@ -21,7 +21,7 @@ const Game = () => {
 		categories,
 		isLoading,
 		error,
-		playerQueue,
+		maxPlayersToProcess,
 	} = useGameStore();
 
 	const {
@@ -36,7 +36,7 @@ const Game = () => {
 	} = useModalStore();
 
 	// Загрузка клуба и инициализация игры при загрузке компонента
-	useEffect(() => {
+	React.useEffect(() => {
 		const loadData = async () => {
 			try {
 				// Загружаем данные игры
@@ -159,7 +159,7 @@ const Game = () => {
 					/>
 				</div>
 				<div className='text-right text-[clamp(1rem,2vw,2rem)] font-[500] mt-2'>
-					{processedPlayersCount} / {playerQueue.length}
+					{processedPlayersCount} / {maxPlayersToProcess}
 				</div>
 			</div>
 
