@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useGameStore, useModalStore } from '../store';
-import { categories, club, players } from '../constants';
+import { categories, club } from '../constants';
 import { Modal, CategoryItem } from '../components';
 
 const Game = () => {
@@ -9,9 +9,9 @@ const Game = () => {
 
 	// Zustand stores
 	const {
-		currentPlayerIndex,
 		categorizedPlayers,
 		progressPercentage,
+		processedPlayersCount,
 		addPlayerToCategory,
 		replacePlayerInCategory,
 		getCurrentPlayer,
@@ -63,7 +63,12 @@ const Game = () => {
 	// Обработчик замены игрока
 	const handleReplacePlayer = (playerToReplace: any) => {
 		if (categoryName) {
-			replacePlayerInCategory(categoryName, playerToReplace);
+			const result = replacePlayerInCategory(categoryName, playerToReplace);
+
+			// Проверяем завершение игры после замены
+			if (result === 'game_finished') {
+				navigate('/results');
+			}
 		}
 	};
 
@@ -101,7 +106,7 @@ const Game = () => {
 					/>
 				</div>
 				<div className='text-right text-[clamp(1rem,2vw,2rem)] font-[500] mt-2'>
-					{currentPlayerIndex + 1} / {players.length}
+					{processedPlayersCount} / 20
 				</div>
 			</div>
 

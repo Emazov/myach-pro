@@ -25,7 +25,7 @@ interface GameState {
 	replacePlayerInCategory: (
 		categoryName: string,
 		playerToReplace: Player,
-	) => void;
+	) => AddPlayerResult;
 	getCategoryFilled: (categoryName: string) => string;
 	getCurrentPlayer: () => Player | undefined;
 	resetGame: () => void;
@@ -99,11 +99,11 @@ export const useGameStore = create<GameState>()(
 				replacePlayerInCategory: (
 					categoryName: string,
 					playerToReplace: Player,
-				) => {
+				): AddPlayerResult => {
 					const state = get();
 					const currentPlayer = state.playerQueue[state.currentPlayerIndex];
 
-					if (!currentPlayer) return;
+					if (!currentPlayer) return 'player_not_found';
 
 					// Заменяем игрока в категории
 					const categoryPlayers = state.categorizedPlayers[categoryName] || [];
@@ -114,9 +114,8 @@ export const useGameStore = create<GameState>()(
 					// Добавляем замененного игрока в конец очереди
 					const updatedQueue = [...state.playerQueue, playerToReplace];
 
-					const newProcessedCount = state.processedPlayersCount + 1;
+					// При замене игрока processedPlayersCount НЕ увеличивается
 					const newCurrentIndex = state.currentPlayerIndex + 1;
-					const newProgressPercentage = (newProcessedCount / 20) * 100;
 
 					set({
 						categorizedPlayers: {
@@ -125,9 +124,15 @@ export const useGameStore = create<GameState>()(
 						},
 						playerQueue: updatedQueue,
 						currentPlayerIndex: newCurrentIndex,
-						processedPlayersCount: newProcessedCount,
-						progressPercentage: newProgressPercentage,
+						// processedPlayersCount и progressPercentage не изменяются при замене
 					});
+
+					// При замене игрока проверяем завершение по текущему счетчику
+					if (state.processedPlayersCount >= 20) {
+						return 'game_finished';
+					}
+
+					return 'success';
 				},
 
 				getCategoryFilled: (categoryName: string) => {
