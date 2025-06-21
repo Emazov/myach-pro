@@ -81,14 +81,13 @@ export const authenticateTelegramUser = async (
 	initData: string,
 ): Promise<User | null> => {
 	try {
-		const response = await fetch(`${API_URL}/auth/auth`, {
+		const response = await fetch(`${API_URL}/auth`, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
+				Authorization: `tma ${initData}`,
 			},
-			body: JSON.stringify({ initData }),
 		});
-		
 
 		if (response.status === 401 || response.status === 403) {
 			// Неавторизованный или запрещенный доступ

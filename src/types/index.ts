@@ -39,10 +39,10 @@ export interface ModalProps {
 	onChooseOtherCategory?: () => void;
 }
 
-export type UserRole = 'Admin' | 'User';
+export type UserRole = 'admin' | 'user';
 
 export interface User {
-	id: number;
+	id: string;
 	telegramId: number;
 	role: UserRole;
 }

@@ -35,7 +35,7 @@ export const useUserStore = create<UserState>()(
 							set({
 								user,
 								telegramId: user.telegramId,
-								isAdmin: user.role === 'Admin',
+								isAdmin: user.role === 'admin',
 								isLoading: false,
 							});
 						} else {
